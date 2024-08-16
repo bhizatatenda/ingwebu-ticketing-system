@@ -92,28 +92,31 @@
     </div>
 
     <script src="script.js"></script>
-    <script>
-        document.getElementById('ticketForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const ticket = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                department: document.getElementById('department').value,
-                issue: document.getElementById('issue').value,
-                status: 'Open',
-                id: Date.now()
-            };
-            
-            addTicket(ticket);
-            displayTicket(ticket, document.getElementById('ticketList'));
-            
-            // Clear form
-            this.reset();
-        });
+<script>
+    document.getElementById('ticketForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const ticket = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            department: document.getElementById('department').value,
+            issue: document.getElementById('issue').value,
+            status: 'Open',
+            id: Date.now()
+        };
+        
+        await addTicket(ticket);
+        displayTicket(ticket, document.getElementById('ticketList'));
+        
+        // Clear form
+        this.reset();
+    });
 
-        // Display existing tickets
-        getTickets().forEach(ticket => displayTicket(ticket, document.getElementById('ticketList')));
-    </script>
+    // Display existing tickets
+    (async function() {
+        const tickets = await getTickets();
+        tickets.forEach(ticket => displayTicket(ticket, document.getElementById('ticketList')));
+    })();
+</script>
 </body>
 </html>

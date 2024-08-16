@@ -82,12 +82,12 @@
     <script>
         const adminUsername = "Admin";
         const adminPassword = "@ReneGADE24!";
-
+    
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-
+    
             if (username === adminUsername && password === adminPassword) {
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('ticketList').style.display = 'block';
@@ -96,43 +96,34 @@
                 document.getElementById('loginError').style.display = 'block';
             }
         });
-
-        function updateTicketStatus(ticketId, newStatus) {
-            const tickets = getTickets();
+    
+        async function updateTicketStatus(ticketId, newStatus) {
+            const tickets = await getTickets();
             const ticket = tickets.find(t => t.id == ticketId);
             if (ticket) {
                 ticket.status = newStatus;
-                localStorage.setItem('tickets', JSON.stringify(tickets));
-                loadTickets();
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify(tickets)
+                });
+                await loadTickets();
             }
         }
-
+    
         function displayAdminTicket(ticket, container) {
-            const ticketElement = document.createElement('div');
-            ticketElement.className = 'ticket';
-            ticketElement.innerHTML = `
-                <h3>Ticket #${ticket.id}</h3>
-                <p><strong>Name:</strong> ${ticket.name}</p>
-                <p><strong>Email:</strong> ${ticket.email}</p>
-                <p><strong>Department:</strong> ${ticket.department}</p>
-                <p><strong>Issue:</strong> ${ticket.issue}</p>
-                <p><strong>Status:</strong> ${ticket.status}</p>
-                <select id="status-${ticket.id}">
-                    <option value="Open" ${ticket.status === 'Open' ? 'selected' : ''}>Open</option>
-                    <option value="In Progress" ${ticket.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                    <option value="Closed" ${ticket.status === 'Closed' ? 'selected' : ''}>Closed</option>
-                </select>
-                <button onclick="updateTicketStatus(${ticket.id}, document.getElementById('status-${ticket.id}').value)">
-                    Update Status
-                </button>
-            `;
-            container.appendChild(ticketElement);
+            // This function should already be in your admin.html
+            // Keep it as is
         }
-
-        function loadTickets() {
+    
+        async function loadTickets() {
             const ticketList = document.getElementById('ticketList');
             ticketList.innerHTML = '';
-            getTickets().forEach(ticket => displayAdminTicket(ticket, ticketList));
+            const tickets = await getTickets();
+            tickets.forEach(ticket => displayAdminTicket(ticket, ticketList));
         }
     </script>
 </body>

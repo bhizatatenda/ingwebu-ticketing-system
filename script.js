@@ -1,5 +1,5 @@
-const BIN_ID = 'YOUR_BIN_ID_HERE'; // Replace with your actual Bin ID
-const API_KEY = '$2b$10$YOUR_API_KEY_HERE'; // Replace with your actual API key
+const BIN_ID = 66bf0f3ce41b4d34e4211164; // Replace with your actual Bin ID
+const API_KEY = $2a$10$L/qiQCRu7BNagbye3iuK0.GBEG.v/9b99l7eRbIONIO6dkuerLHb6; // Replace with your actual API key
 
 async function getTickets() {
     const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {

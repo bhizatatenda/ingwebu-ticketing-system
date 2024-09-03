@@ -98,21 +98,25 @@
         });
 
         async function updateTicketStatus(ticketId, newStatus) {
-            const tickets = await getTickets();
-            const ticket = tickets.find(t => t.id == ticketId);
-            if (ticket) {
-                ticket.status = newStatus;
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': API_KEY
-                    },
-                    body: JSON.stringify(tickets)
-                });
-                await loadTickets();
-            }
+    try {
+        const currentData = await getTickets();
+        const ticketIndex = currentData.findIndex(t => t.id == ticketId);
+        if (ticketIndex !== -1) {
+            currentData[ticketIndex].status = newStatus;
+            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': API_KEY
+                },
+                body: JSON.stringify({ tickets: currentData })
+            });
+            await loadTickets();
         }
+    } catch (error) {
+        console.error('Error updating ticket status:', error);
+    }
+}
 
         function displayAdminTicket(ticket, container) {
             const ticketElement = document.createElement('div');

@@ -77,12 +77,16 @@
 
     <script src="script.js"></script>
     <script>
+        let userEmail = '';
+    
         document.getElementById('ticketForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            userEmail = document.getElementById('email').value;
+            
             const ticket = {
                 name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
+                email: userEmail,
                 department: document.getElementById('department').value,
                 issue: document.getElementById('issue').value,
                 status: 'Open',
@@ -94,13 +98,24 @@
             
             // Clear form
             this.reset();
+            
+            // Refresh ticket list
+            loadUserTickets();
         });
-
-        // Display existing tickets
-        (async function() {
+    
+        async function loadUserTickets() {
+            const ticketList = document.getElementById('ticketList');
+            ticketList.innerHTML = '';
             const tickets = await getTickets();
-            tickets.forEach(ticket => displayTicket(ticket, document.getElementById('ticketList')));
-        })();
+            const userTickets = tickets.filter(ticket => ticket.email === userEmail);
+            userTickets.forEach(ticket => displayTicket(ticket, ticketList));
+        }
+    
+        // Display existing tickets for the current user
+        document.getElementById('email').addEventListener('change', function() {
+            userEmail = this.value;
+            loadUserTickets();
+        });
     </script>
 </body>
 </html>

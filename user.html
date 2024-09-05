@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Interface - Ingwebu Breweries Ticketing System</title>
+    <title>User Ticketing System</title>
     <style>
-        body {
+         body {
     background-image: url('img/n2.jpeg');
     background-size: cover;
     background-position: center;
@@ -80,80 +80,96 @@
 <body>
     <div class="overlay"></div>
     <div class="container">
-        <h1>Ingwebu Breweries Ticketing System</h1>
-        <form id="ticketForm">
-            <input type="text" id="name" placeholder="Your Name" required>
-            <input type="email" id="email" placeholder="Your Email" required>
-            <select id="department" required>
-                <option value="">Select Department</option>
-                <option value="Production">Production</option>
-                <option value="Sales">Sales</option>
-                <option value="Marketing">Marketing</option>
-                <option value="IT">IT</option>
-            </select>
-            <textarea id="issue" placeholder="Describe your issue" required></textarea>
-            <button type="submit">Submit Ticket</button>
-        </form>
-        <div id="ticketList"></div>
+        <h1>User Ticketing System</h1>
+        <div id="loginSection">
+            <h2>Login or Sign Up</h2>
+            <input type="email" id="loginEmail" placeholder="Email">
+            <input type="password" id="loginPassword" placeholder="Password">
+            <button onclick="loginOrSignup()">Login / Sign Up</button>
+        </div>
+        <div id="ticketSection" style="display:none;">
+            <h2>Submit a New Ticket</h2>
+            <form id="ticketForm">
+                <input type="text" id="name" placeholder="Your Name" required>
+                <input type="text" id="location" placeholder="Your Location" required>
+                <select id="department" required>
+                    <option value="">Select Department</option>
+                    <option value="IT">IT</option>
+                    <option value="HR">HR</option>
+                    <option value="Finance">Finance</option>
+                </select>
+                <textarea id="issue" placeholder="Describe your issue" required></textarea>
+                <button type="submit">Submit Ticket</button>
+            </form>
+            <h2>Your Tickets</h2>
+            <div id="ticketList"></div>
+        </div>
     </div>
-
     <script src="script.js"></script>
-<script>
-    let userEmail = '';
+    <script>
+        let userEmail = '';
 
-    document.getElementById('ticketForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        userEmail = document.getElementById('email').value;
-        
-        const ticket = {
-            name: document.getElementById('name').value,
-            email: userEmail,
-            department: document.getElementById('department').value,
-            issue: document.getElementById('issue').value,
-            status: 'Open',
-            id: Date.now(),
-            createdAt: new Date().toLocaleString() // Add this line
-        };
-        
-        await addTicket(ticket);
-        displayTicket(ticket, document.getElementById('ticketList'));
-        
-        // Clear form
-        this.reset();
-        
-        // Refresh ticket list
-        loadUserTickets();
-    });
+        async function loginOrSignup() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
 
-    function displayTicket(ticket, container) {
-        const ticketElement = document.createElement('div');
-        ticketElement.className = 'ticket';
-        ticketElement.innerHTML = `
-            <h3>Ticket #${ticket.id}</h3>
-            <p><strong>Name:</strong> ${ticket.name}</p>
-            <p><strong>Email:</strong> ${ticket.email}</p>
-            <p><strong>Department:</strong> ${ticket.department}</p>
-            <p><strong>Issue:</strong> ${ticket.issue}</p>
-            <p><strong>Status:</strong> ${ticket.status}</p>
-            <p><strong>Created At:</strong> ${ticket.createdAt}</p> <!-- Add this line -->
-        `;
-        container.appendChild(ticketElement);
-    }
+            if (!email.endsWith('@ingwebu.co.zw')) {
+                alert('Only @ingwebu.co.zw email addresses are allowed.');
+                return;
+            }
 
-    async function loadUserTickets() {
-        const ticketList = document.getElementById('ticketList');
-        ticketList.innerHTML = '';
-        const tickets = await getTickets();
-        const userTickets = tickets.filter(ticket => ticket.email === userEmail);
-        userTickets.forEach(ticket => displayTicket(ticket, ticketList));
-    }
+            // Here you would typically validate the login/signup with a backend
+            // For this example, we'll just set the email and show the ticket section
+            userEmail = email;
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('ticketSection').style.display = 'block';
+            loadUserTickets();
+        }
 
-    // Display existing tickets for the current user
-    document.getElementById('email').addEventListener('change', function() {
-        userEmail = this.value;
-        loadUserTickets();
-    });
-</script>
+        document.getElementById('ticketForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const ticket = {
+                name: document.getElementById('name').value,
+                email: userEmail,
+                location: document.getElementById('location').value,
+                department: document.getElementById('department').value,
+                issue: document.getElementById('issue').value,
+                status: 'Open',
+                id: Date.now(),
+                createdAt: new Date().toLocaleString()
+            };
+            
+            await addTicket(ticket);
+            displayTicket(ticket, document.getElementById('ticketList'));
+            
+            this.reset();
+            loadUserTickets();
+        });
+
+        function displayTicket(ticket, container) {
+            const ticketElement = document.createElement('div');
+            ticketElement.className = 'ticket';
+            ticketElement.innerHTML = `
+                <h3>Ticket #${ticket.id}</h3>
+                <p><strong>Name:</strong> ${ticket.name}</p>
+                <p><strong>Email:</strong> ${ticket.email}</p>
+                <p><strong>Location:</strong> ${ticket.location}</p>
+                <p><strong>Department:</strong> ${ticket.department}</p>
+                <p><strong>Issue:</strong> ${ticket.issue}</p>
+                <p><strong>Status:</strong> ${ticket.status}</p>
+                <p><strong>Created At:</strong> ${ticket.createdAt}</p>
+            `;
+            container.appendChild(ticketElement);
+        }
+
+        async function loadUserTickets() {
+            const ticketList = document.getElementById('ticketList');
+            ticketList.innerHTML = '';
+            const tickets = await getTickets();
+            const userTickets = tickets.filter(ticket => ticket.email === userEmail);
+            userTickets.forEach(ticket => displayTicket(ticket, ticketList));
+        }
+    </script>
 </body>
 </html>

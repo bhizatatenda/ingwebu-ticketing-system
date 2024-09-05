@@ -98,46 +98,62 @@
     </div>
 
     <script src="script.js"></script>
-    <script>
-        let userEmail = '';
-    
-        document.getElementById('ticketForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            userEmail = document.getElementById('email').value;
-            
-            const ticket = {
-                name: document.getElementById('name').value,
-                email: userEmail,
-                department: document.getElementById('department').value,
-                issue: document.getElementById('issue').value,
-                status: 'Open',
-                id: Date.now()
-            };
-            
-            await addTicket(ticket);
-            displayTicket(ticket, document.getElementById('ticketList'));
-            
-            // Clear form
-            this.reset();
-            
-            // Refresh ticket list
-            loadUserTickets();
-        });
-    
-        async function loadUserTickets() {
-            const ticketList = document.getElementById('ticketList');
-            ticketList.innerHTML = '';
-            const tickets = await getTickets();
-            const userTickets = tickets.filter(ticket => ticket.email === userEmail);
-            userTickets.forEach(ticket => displayTicket(ticket, ticketList));
-        }
-    
-        // Display existing tickets for the current user
-        document.getElementById('email').addEventListener('change', function() {
-            userEmail = this.value;
-            loadUserTickets();
-        });
-    </script>
+<script>
+    let userEmail = '';
+
+    document.getElementById('ticketForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        userEmail = document.getElementById('email').value;
+        
+        const ticket = {
+            name: document.getElementById('name').value,
+            email: userEmail,
+            department: document.getElementById('department').value,
+            issue: document.getElementById('issue').value,
+            status: 'Open',
+            id: Date.now(),
+            createdAt: new Date().toLocaleString() // Add this line
+        };
+        
+        await addTicket(ticket);
+        displayTicket(ticket, document.getElementById('ticketList'));
+        
+        // Clear form
+        this.reset();
+        
+        // Refresh ticket list
+        loadUserTickets();
+    });
+
+    function displayTicket(ticket, container) {
+        const ticketElement = document.createElement('div');
+        ticketElement.className = 'ticket';
+        ticketElement.innerHTML = `
+            <h3>Ticket #${ticket.id}</h3>
+            <p><strong>Name:</strong> ${ticket.name}</p>
+            <p><strong>Email:</strong> ${ticket.email}</p>
+            <p><strong>Department:</strong> ${ticket.department}</p>
+            <p><strong>Issue:</strong> ${ticket.issue}</p>
+            <p><strong>Status:</strong> ${ticket.status}</p>
+            <p><strong>Created At:</strong> ${ticket.createdAt}</p> <!-- Add this line -->
+        `;
+        container.appendChild(ticketElement);
+    }
+
+    async function loadUserTickets() {
+        const ticketList = document.getElementById('ticketList');
+        ticketList.innerHTML = '';
+        const tickets = await getTickets();
+        const userTickets = tickets.filter(ticket => ticket.email === userEmail);
+        userTickets.forEach(ticket => displayTicket(ticket, ticketList));
+    }
+
+    // Display existing tickets for the current user
+    document.getElementById('email').addEventListener('change', function() {
+        userEmail = this.value;
+        loadUserTickets();
+    });
+</script>
 </body>
 </html>
